@@ -1,10 +1,8 @@
-add_executable(DbConnectionPool_tests
-        test.cpp
-)
+add_executable(DbConnectionPool_tests db_pool_test.cpp)
+add_executable(IntrusivePtr_tests intrusive_ptr_test.cpp)
 
-target_link_libraries(DbConnectionPool_tests
-        PRIVATE
-        DbConnectionPool::DbConnectionPool
-)
+target_link_libraries(DbConnectionPool_tests PRIVATE DbConnectionPool::DbConnectionPool)
+target_link_libraries(IntrusivePtr_tests PRIVATE DbConnectionPool::DbConnectionPool)
 
-add_test(NAME DbConnectionPool.smoke COMMAND DbConnectionPool_tests)
+add_test(NAME DbConnectionPoolTests COMMAND DbConnectionPool_tests)
+add_test(NAME IntrusivePtrTests COMMAND IntrusivePtr_tests)

@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "core/ref.h"
 
 namespace Core::Database {
 
@@ -146,18 +147,16 @@ namespace Core::Database {
     template<class T>
     requires std::derived_from<T, IConnection>
     ConnectionManager<T> ConnectionPool<T>::wrap_connection(std::unique_ptr<T> c) noexcept {
-        std::weak_ptr<ConnectionPool> weak_self = this->weak_from_this();
+        std_ex::intrusive_ptr<ConnectionPool> instance = this->intrusive_from_this();
 
-        auto releaser = [weak_self](std::unique_ptr<T> returned_conn) noexcept {
+        auto releaser = [instance](std::unique_ptr<T> returned_conn) noexcept {
             if (!returned_conn)
                 return;
-            if (auto self = weak_self.lock()) {
-                {
-                    std::unique_lock<std::mutex> lk(self->m_mutex);
-                    self->m_connections.push(std::move(returned_conn));
-                }
-                self->m_capacity.release();
+            {
+                std::unique_lock<std::mutex> lk(instance->m_mutex);
+                instance->m_connections.push(std::move(returned_conn));
             }
+            instance->m_capacity.release();
         };
 
         return ConnectionManager<T>(std::move(c), std::move(releaser));

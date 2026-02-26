@@ -30,11 +30,11 @@ int main() {
     cfg.max_size = 1;
     cfg.is_eager = true;
 
-    auto pool = std::make_shared<Core::Database::ConnectionPool<FakeConn>>(factory, cfg);
+    auto pool = std_ex::make_intrusive<Core::Database::ConnectionPool<FakeConn>>(factory, cfg);
     pool->wait_for_warmup();
 
     {
-        auto res = pool->acquire(1s);
+        auto res = pool->acquire();
         assert(res.has_value());
         auto mgr = std::move(res.value());
         assert(mgr->value == 42);
