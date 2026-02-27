@@ -12,7 +12,6 @@
 #include "connection.h"
 #include "connection_factory.h"
 #include "connection_manager.h"
-#include <trantor/utils/Logger.h>
 #include <core/ref.h>
 
 namespace Core::Database {

@@ -3,7 +3,6 @@
 //
 
 #pragma once
-#include "core/ref.h"
 
 namespace Core::Database {
 
@@ -51,7 +50,6 @@ namespace Core::Database {
             if (m_capacity.try_acquire()) {
                 auto conn_res = m_factory->create_connection<T>();
                 if (!conn_res) {
-                    LOG_ERROR << conn_res.error().to_str();
                     m_capacity.release();
                     std::this_thread::sleep_for(1000ms);
                     continue;
@@ -87,7 +85,6 @@ namespace Core::Database {
         while (!m_pool_ready.load(std::memory_order_acquire)) {
             m_pool_ready.wait(false, std::memory_order_acquire);
         }
-        LOG_INFO << "Connection pool is warmup";
     }
 
     template<class T> requires std::derived_from<T, IConnection>

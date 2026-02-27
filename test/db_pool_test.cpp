@@ -4,7 +4,7 @@
 #include <cassert>
 #include <chrono>
 #include <memory>
-
+#include <gtest/gtest.h>
 #include <database/connection_pool.h>
 
 using namespace std::chrono_literals;
@@ -18,7 +18,7 @@ namespace {
     };
 }
 
-int main() {
+TEST(ConnectionPoolTest, AsynTest) {
     auto factory = std::make_shared<Core::Database::ConnectionFactory>();
 
     factory->register_factory<FakeConn>([]() -> Core::Database::ConnectionResult {
@@ -35,13 +35,15 @@ int main() {
 
     {
         auto res = pool->acquire();
-        assert(res.has_value());
+        ASSERT_TRUE(res.has_value());
         auto mgr = std::move(res.value());
-        assert(mgr->value == 42);
+        ASSERT_EQ(mgr->value,  42);
     } // manager destructor should return connection to pool
 
     auto res2 = pool->acquire(1s);
-    assert(res2.has_value());
-
-    return 0;
+    ASSERT_TRUE(res2.has_value());
+}
+int main(int argc, char **argv) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

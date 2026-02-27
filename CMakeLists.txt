@@ -11,15 +11,6 @@ project(DbConnectionPool
 
 add_library(DbConnectionPool INTERFACE)
 
-include(FetchContent)
-FetchContent_Declare(
-        trantor
-        GIT_REPOSITORY https://github.com/an-tao/trantor.git
-        GIT_TAG v1.5.26
-)
-FetchContent_MakeAvailable(trantor)
-target_link_libraries(DbConnectionPool INTERFACE trantor)
-
 target_include_directories(DbConnectionPool INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
