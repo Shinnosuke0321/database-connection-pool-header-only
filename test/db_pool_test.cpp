@@ -18,7 +18,7 @@ namespace {
     };
 }
 
-TEST(ConnectionPoolTest, AsynTest) {
+TEST(ConnectionPoolTest, PoolTest) {
     auto factory = std::make_shared<Core::Database::ConnectionFactory>();
 
     factory->register_factory<FakeConn>([]() -> Core::Database::ConnectionResult {
@@ -32,16 +32,24 @@ TEST(ConnectionPoolTest, AsynTest) {
 
     auto pool = std_ex::make_intrusive<Core::Database::ConnectionPool<FakeConn>>(factory, cfg);
     pool->wait_for_warmup();
-
+    ASSERT_EQ(pool->ref_count(), 1);
     {
         auto res = pool->acquire();
-        ASSERT_TRUE(res.has_value());
+        ASSERT_EQ(pool->ref_count(), 2);
         auto mgr = std::move(res.value());
+        ASSERT_EQ(pool->ref_count(), 2);
         ASSERT_EQ(mgr->value,  42);
     } // manager destructor should return connection to pool
+    ASSERT_EQ(pool->ref_count(), 1);
 
-    auto res2 = pool->acquire(1s);
-    ASSERT_TRUE(res2.has_value());
+    {
+        auto res2 = pool->acquire(1s);
+        ASSERT_EQ(pool->ref_count(), 2);
+        auto& mgr2 = res2.value();
+        ASSERT_EQ(pool->ref_count(), 2);
+        ASSERT_EQ(mgr2->value, 42);
+    }
+    ASSERT_EQ(pool->ref_count(), 1);
 }
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);

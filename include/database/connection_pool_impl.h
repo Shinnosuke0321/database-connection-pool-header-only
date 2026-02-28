@@ -145,12 +145,14 @@ namespace Core::Database {
     requires std::derived_from<T, IConnection>
     ConnectionManager<T> ConnectionPool<T>::wrap_connection(std::unique_ptr<T> c) noexcept {
         std_ex::intrusive_ptr<ConnectionPool> instance = this->intrusive_from_this();
+        std::println("Refcount: {}", instance->ref_count());
 
         auto releaser = [instance](std::unique_ptr<T> returned_conn) noexcept {
             if (!returned_conn)
                 return;
             {
                 std::unique_lock<std::mutex> lk(instance->m_mutex);
+                std::println("Refcount inside lamda: {}", instance->ref_count());
                 instance->m_connections.push(std::move(returned_conn));
             }
             instance->m_capacity.release();

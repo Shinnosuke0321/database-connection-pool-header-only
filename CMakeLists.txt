@@ -1,13 +1,9 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.26)
+project(DbConnectionPool VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-project(DbConnectionPool
-        VERSION 1.0.0
-        LANGUAGES CXX
-)
 
 add_library(DbConnectionPool INTERFACE)
 

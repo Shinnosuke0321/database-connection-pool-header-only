@@ -10,7 +10,7 @@ if (NOT GTest_FOUND)
 endif ()
 
 # Set the desired sanitizer type
-set(SANITIZER_TYPE "thread") # or "address"
+set(SANITIZER_TYPE "address") # or "address"
 
 # Add compile and link options
 list(APPEND CMAKE_C_FLAGS "-fsanitize=${SANITIZER_TYPE}")
