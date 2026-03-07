@@ -63,7 +63,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt install -y gcc-13 g++-13 clang ninja-build
+          sudo apt install -y gcc-13 g++-13 clang-17 ninja-build
 
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
@@ -75,7 +75,7 @@ jobs:
         run: |
           cmake -G Ninja -B build \
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
-          -DCMAKE_CXX_COMPILER='${{ matrix.cpp_compiler }}' \
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
           -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
           -S ${{ github.workspace }}
 
