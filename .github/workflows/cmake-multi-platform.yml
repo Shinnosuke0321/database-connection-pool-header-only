@@ -35,9 +35,14 @@ jobs:
             cc: cl
             cxx: cl
 
+          - os: macos-latest
+            compiler: apple-clang
+
         exclude:
           - os: ubuntu-24.04
             compiler: msvc
+          - os: ubuntu-24.04
+            compiler: apple-clang
           - os: windows-latest
             compiler: gcc
           - os: windows-latest
@@ -49,6 +54,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install ninja cmake llvm clang-format
 
       # Install Ninja on Linux
       - name: Install dependencies (Linux)
