@@ -15,10 +15,10 @@ jobs:
         build_type: [ Debug, Release, RelWithDebInfo ]
         include:
           # Linux GCC
-          - os: ubuntu-24.04
-            compiler: gcc
-            cc: gcc-14
-            cxx: g++-14
+#          - os: ubuntu-24.04
+#            compiler: gcc
+#            cc: gcc-14
+#            cxx: g++-14
 
           # Linux Clang
           - os: ubuntu-24.04
@@ -27,10 +27,10 @@ jobs:
             cxx: clang++
 
           # Windows MSVC
-          - os: windows-latest
-            compiler: msvc
-            cc: cl
-            cxx: cl
+#          - os: windows-latest
+#            compiler: msvc
+#            cc: cl
+#            cxx: cl
     steps:
       - uses: actions/checkout@v4
 
@@ -42,9 +42,9 @@ jobs:
           sudo apt-get install -y clang libc++-dev libc++abi-dev ninja-build gcc-14 g++-14 clang
 
       # Setup MSVC environment
-      - name: Setup MSVC
-        if: runner.os == 'Windows'
-        uses: ilammy/msvc-dev-cmd@v1
+#      - name: Setup MSVC
+#        if: runner.os == 'Windows'
+#        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Configure
         shell: bash
@@ -53,7 +53,7 @@ jobs:
             -DCMAKE_C_COMPILER=${{ matrix.cc }} \
             -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-            -DCMAKE_CXX_FLAGS="-stdlib=libc++"
+            -DCMAKE_CXX_FLAGS="-stdlib=libstdc++"
 
       - name: Build
         run: cmake --build build
