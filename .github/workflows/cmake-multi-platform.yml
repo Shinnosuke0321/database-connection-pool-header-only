@@ -32,12 +32,6 @@ jobs:
             cc: cl
             cxx: cl
 
-          # macOS AppleClang
-          - os: macos-latest
-            compiler: appleclang
-            cc: clang
-            cxx: clang++
-
     runs-on: ${{ matrix.os }}
 
     steps:
