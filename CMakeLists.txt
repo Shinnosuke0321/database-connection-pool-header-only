@@ -14,9 +14,7 @@ target_include_directories(DbConnectionPool INTERFACE
 
 add_library(DbConnectionPool::DbConnectionPool ALIAS DbConnectionPool)
 
-target_compile_features(DbConnectionPool
-        INTERFACE cxx_std_23
-)
+target_compile_features(DbConnectionPool INTERFACE cxx_std_23)
 
 include(CTest)
 if (PROJECT_IS_TOP_LEVEL AND BUILD_TESTING)
