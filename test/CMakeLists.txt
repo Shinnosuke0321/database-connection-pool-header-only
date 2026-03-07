@@ -9,8 +9,11 @@ if (NOT GTest_FOUND)
     FetchContent_MakeAvailable(googletest)
 endif ()
 
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 # Set the desired sanitizer type
-set(SANITIZER_TYPE "address") # or "address"
+set(SANITIZER_TYPE "address")
 
 # Add compile and link options
 list(APPEND CMAKE_C_FLAGS "-fsanitize=${SANITIZER_TYPE}")
