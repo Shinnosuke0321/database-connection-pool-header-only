@@ -50,15 +50,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y clang libc++-dev libc++abi-dev
 
-      - name: Build and Test with Clang
-        run: |
-          echo '#include <iostream>' > test.cpp
-          echo '#include <expected>' > test.cpp
-          echo 'std::expected<int,int> foo() { return 5;}' > test.cpp
-          echo 'int main() { return 0; }' >> test.cpp
-          clang++ -std=c++23 test.cpp -o test
-          ./test
-
       # Setup MSVC environment
       - name: Setup MSVC
         if: runner.os == 'Windows'
