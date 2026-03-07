@@ -39,7 +39,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang libc++-dev libc++abi-dev ninja-build gcc-13 g++-13 clang
+          sudo apt-get install -y clang libc++-dev libc++abi-dev ninja-build gcc-14 g++-14 clang
 
       # Setup MSVC environment
 #      - name: Setup MSVC
@@ -50,8 +50,8 @@ jobs:
         shell: bash
         run: |
           cmake -S . -B build -G Ninja \
-            -DCMAKE_C_COMPILER=gcc-13 \
-            -DCMAKE_CXX_COMPILER=g++-13 \
+            -DCMAKE_C_COMPILER=gcc-14 \
+            -DCMAKE_CXX_COMPILER=g++-14 \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
       - name: Build
