@@ -42,15 +42,12 @@ jobs:
         exclude:
           - os: ubuntu-24.04
             c_compiler: cl
-            cpp_compiler: cl
 
           - os: windows-latest
             c_compiler: gcc-13
-            cpp_compiler: g++-13
 
           - os: windows-latest
             c_compiler: clang-17
-            cpp_compiler: clang++-17
 
     steps:
       - uses: actions/checkout@v4
