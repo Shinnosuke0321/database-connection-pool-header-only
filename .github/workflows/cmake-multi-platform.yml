@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -30,9 +31,6 @@ jobs:
             compiler: msvc
             cc: cl
             cxx: cl
-
-    runs-on: ${{ matrix.os }}
-
     steps:
       - uses: actions/checkout@v4
 
