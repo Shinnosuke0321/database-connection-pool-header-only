@@ -12,19 +12,9 @@ endif ()
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-# Set the desired sanitizer type
-set(SANITIZER_TYPE "address")
 
-# Add compile and link options
-list(APPEND CMAKE_C_FLAGS "-fsanitize=${SANITIZER_TYPE}")
-list(APPEND CMAKE_CXX_FLAGS "-fsanitize=${SANITIZER_TYPE}")
-list(APPEND CMAKE_EXE_LINKER_FLAGS "-fsanitize=${SANITIZER_TYPE}")
-
-if(SANITIZER_TYPE STREQUAL "thread")
-    set(CTEST_MEMORYCHECK_TYPE "ThreadSanitizer")
-elseif(SANITIZER_TYPE STREQUAL "address")
-    set(CTEST_MEMORYCHECK_TYPE "AddressSanitizer")
-endif()
+# Sanitizer option
+set(SANITIZER_TYPE "address" CACHE STRING "Sanitizer type (address, thread, undefined, none)")
 
 add_executable(DbConnectionPool_tests db_pool_test.cpp)
 add_executable(IntrusivePtr_tests intrusive_ptr_test.cpp)
@@ -37,6 +27,26 @@ target_link_libraries(IntrusivePtr_tests PRIVATE
         DbConnectionPool::DbConnectionPool
         GTest::gtest_main
 )
+
+# Apply sanitizer only for supported compilers
+if (NOT SANITIZER_TYPE STREQUAL "none")
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+
+        foreach(target
+                DbConnectionPool_tests
+                IntrusivePtr_tests
+        )
+            target_compile_options(${target} PRIVATE
+                    -fsanitize=${SANITIZER_TYPE}
+                    -fno-omit-frame-pointer
+            )
+
+            target_link_options(${target} PRIVATE
+                    -fsanitize=${SANITIZER_TYPE}
+            )
+        endforeach()
+    endif()
+endif()
 
 include(GoogleTest)
 gtest_discover_tests(DbConnectionPool_tests)
