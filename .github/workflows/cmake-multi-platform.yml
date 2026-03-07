@@ -52,6 +52,7 @@ jobs:
 
       - name: Build and Test with Clang
         run: |
+          echo '#include <iostream>' > test.cpp
           echo '#include <expected>' > test.cpp
           echo 'std::expected<int,int> foo() { return 5;}' > test.cpp
           echo 'int main() { return 0; }' >> test.cpp
