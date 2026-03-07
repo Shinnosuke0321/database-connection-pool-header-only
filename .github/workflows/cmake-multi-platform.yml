@@ -37,6 +37,8 @@ jobs:
 
           - os: macos-latest
             compiler: apple-clang
+            cc: [clang, gcc]
+            cxx: [clang++, gcc++]
 
         exclude:
           - os: ubuntu-24.04
