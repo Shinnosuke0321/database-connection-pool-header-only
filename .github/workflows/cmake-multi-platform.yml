@@ -23,8 +23,8 @@ jobs:
           # Linux Clang
           - os: ubuntu-24.04
             compiler: clang
-            cc: clang
-            cxx: clang++
+            cc: clang-19
+            cxx: clang++-19
 
           # Windows MSVC
 #          - os: windows-latest
@@ -39,7 +39,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang libc++-dev libc++abi-dev ninja-build gcc-14 g++-14 clang++-19 clang-19
+          sudo apt-get install -y clang-19 clang-tools-19 clang-format-19 clang-tidy-19 libc++-dev libc++abi-dev ninja-build gcc-14 g++-14
 
       # Setup MSVC environment
 #      - name: Setup MSVC
