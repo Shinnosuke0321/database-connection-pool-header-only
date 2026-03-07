@@ -11,8 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-24.04, windows-latest ]
-        compiler: [ gcc, clang, msvc ]
+        os: [ ubuntu-24.04, windows-latest, macos-latest ]
+        compiler: [ gcc, clang, msvc, apple-clang ]
         build_type: [ Debug, Release, RelWithDebInfo ]
         include:
           # Linux GCC
@@ -38,12 +38,14 @@ jobs:
         exclude:
           - os: ubuntu-24.04
             compiler: msvc
-
           - os: windows-latest
             compiler: gcc
-
           - os: windows-latest
             compiler: clang
+          - os: windows-latest
+            compiler: apple-clang
+          - os: macos-latest
+            compiler: msvc
 
     steps:
       - uses: actions/checkout@v4
