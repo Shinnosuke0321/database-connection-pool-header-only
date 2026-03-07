@@ -23,19 +23,19 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-24.04, windows-latest]
         build_type: [Release, Debug, Dist]
         c_compiler: [gcc, clang, cl]
         include:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             c_compiler: gcc
-            cpp_compiler: g++
-          - os: ubuntu-latest
+            cpp_compiler: g++13
+          - os: ubuntu-24.04
             c_compiler: clang
-            cpp_compiler: clang++
+            cpp_compiler: clang++17
         exclude:
           - os: windows-latest
             c_compiler: gcc
