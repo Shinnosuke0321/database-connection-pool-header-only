@@ -17,20 +17,20 @@ jobs:
           # Linux GCC
           - os: ubuntu-24.04
             compiler: gcc
-            cc: gcc
-            cxx: g++
+            cc: gcc-14
+            cxx: g++-14
 
-#          # Linux Clang
-#          - os: ubuntu-24.04
-#            compiler: clang
-#            cc: clang
-#            cxx: clang++
-#
-#          # Windows MSVC
-#          - os: windows-latest
-#            compiler: msvc
-#            cc: cl
-#            cxx: cl
+          # Linux Clang
+          - os: ubuntu-24.04
+            compiler: clang
+            cc: clang
+            cxx: clang++
+
+          # Windows MSVC
+          - os: windows-latest
+            compiler: msvc
+            cc: cl
+            cxx: cl
     steps:
       - uses: actions/checkout@v4
 
@@ -50,8 +50,8 @@ jobs:
         shell: bash
         run: |
           cmake -S . -B build -G Ninja \
-            -DCMAKE_C_COMPILER=gcc-14 \
-            -DCMAKE_CXX_COMPILER=g++-14 \
+            -DCMAKE_C_COMPILER=${{ matrix.cc }} \
+            -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
 
       - name: Build
