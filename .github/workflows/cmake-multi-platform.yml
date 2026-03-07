@@ -34,6 +34,17 @@ jobs:
             compiler: msvc
             cc: cl
             cxx: cl
+
+        exclude:
+          - os: ubuntu-24.04
+            compiler: msvc
+
+          - os: windows-latest
+            compiler: gcc
+
+          - os: windows-latest
+            compiler: clang
+
     steps:
       - uses: actions/checkout@v4
 
@@ -53,7 +64,7 @@ jobs:
         shell: bash
         run: |
           CXX_FLAGS=""
-          if [ "${{ matrix.compiler }}" != "msvc" ]; then
+          if [ "${{ matrix.compiler }}" != "msvc" || "${{ matrix.compiler }}" != "gcc" ]; then
              CXX_FLAGS="-DCMAKE_CXX_FLAGS="-stdlib=${{ matrix.flag }}""
           fi
           
