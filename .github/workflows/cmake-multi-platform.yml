@@ -13,7 +13,6 @@ jobs:
       matrix:
         build_type: [ Debug, Release, RelWithDebInfo ]
         include:
-
           # Linux GCC
           - os: ubuntu-24.04
             compiler: gcc
@@ -50,6 +49,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: Configure
+        shell: bash
         run: |
           cmake -S . -B build -G Ninja \
             -DCMAKE_C_COMPILER=${{ matrix.cc }} \
