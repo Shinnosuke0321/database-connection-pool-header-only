@@ -1,5 +1,4 @@
 name: CMake CI
-
 on:
   push:
     branches: [ dev ]
@@ -8,22 +7,27 @@ on:
 
 jobs:
   build:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [ ubuntu-24.04, windows-latest ]
+        compiler: [ gcc, clang, msvc ]
         build_type: [ Debug, Release, RelWithDebInfo ]
         include:
           # Linux GCC
           - os: ubuntu-24.04
             compiler: gcc
-            cc: gcc
-            cxx: g++
+            cc: gcc-14
+            cxx: g++-14
+            flag: libc++
 
           # Linux Clang
           - os: ubuntu-24.04
             compiler: clang
-            cc: clang
-            cxx: clang++
+            cc: clang-19
+            cxx: clang++-19
+            flag: libstdc++
 
           # Windows MSVC
           - os: windows-latest
@@ -31,7 +35,15 @@ jobs:
             cc: cl
             cxx: cl
 
-    runs-on: ${{ matrix.os }}
+        exclude:
+          - os: ubuntu-24.04
+            compiler: msvc
+
+          - os: windows-latest
+            compiler: gcc
+
+          - os: windows-latest
+            compiler: clang
 
     steps:
       - uses: actions/checkout@v4
@@ -41,9 +53,9 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang libc++-dev libc++abi-dev
+          sudo apt-get install -y clang-19 clang-tools-19 clang-format-19 clang-tidy-19 libc++-dev libc++abi-dev ninja-build gcc-14 g++-14
 
-      # Setup MSVC environment
+        # Setup MSVC environment
       - name: Setup MSVC
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
@@ -51,10 +63,16 @@ jobs:
       - name: Configure
         shell: bash
         run: |
+          CLANG_CXX_FLAGS=""
+          if [ "${{ matrix.compiler }}" = "clang" ]; then
+            CLANG_CXX_FLAGS="-DCMAKE_CXX_FLAGS=-stdlib=${{ matrix.flag }}"
+          fi
+          
           cmake -S . -B build -G Ninja \
             -DCMAKE_C_COMPILER=${{ matrix.cc }} \
             -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
-            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            ${CLANG_CXX_FLAGS}
 
       - name: Build
         run: cmake --build build
