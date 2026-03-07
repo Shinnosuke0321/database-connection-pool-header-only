@@ -42,9 +42,9 @@ jobs:
           sudo apt-get install -y clang libc++-dev libc++abi-dev ninja-build gcc-14 g++-14 clang
 
       # Setup MSVC environment
-#      - name: Setup MSVC
-#        if: runner.os == 'Windows'
-#        uses: ilammy/msvc-dev-cmd@v1
+      - name: Setup MSVC
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
 
       - name: Configure
         shell: bash
@@ -52,7 +52,8 @@ jobs:
           cmake -S . -B build -G Ninja \
             -DCMAKE_C_COMPILER=${{ matrix.cc }} \
             -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
-            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+            -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+            -DCMAKE_CXX_FLAGS="-stdlib=libc++"
 
       - name: Build
         run: cmake --build build
