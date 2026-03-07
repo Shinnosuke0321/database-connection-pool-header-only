@@ -36,7 +36,20 @@ jobs:
             cpp_compiler: g++-13
 
           - os: ubuntu-24.04
-            c_compiler: clang
+            c_compiler: clang-17
+            cpp_compiler: clang++-17
+
+        exclude:
+          - os: ubuntu-24.04
+            c_compiler: cl
+            cpp_compiler: cl
+
+          - os: windows-latest
+            c_compiler: gcc-13
+            cpp_compiler: g++-13
+
+          - os: windows-latest
+            c_compiler: clang-17
             cpp_compiler: clang++-17
 
     steps:
@@ -66,7 +79,7 @@ jobs:
           cmake -G Ninja -B build \
           -DCMAKE_C_COMPILER=${{ matrix.c_compiler }} \
           -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }} \
-          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
           -S ${{ github.workspace }}
 
       - name: Build
