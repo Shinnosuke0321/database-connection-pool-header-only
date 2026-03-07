@@ -55,7 +55,7 @@ jobs:
             -DCMAKE_C_COMPILER=${{ matrix.cc }} \
             -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-            -DCMAKE_CXX_FLAGS=${{ matrix.flag }}
+            -DCMAKE_CXX_FLAGS="-stdlib=${{ matrix.flag }}"
 
       - name: Build
         run: cmake --build build
