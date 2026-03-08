@@ -23,6 +23,14 @@ add_library(DbConnectionPool::DbConnectionPool ALIAS DbConnectionPool)
 
 target_compile_features(DbConnectionPool INTERFACE cxx_std_23)
 
+# Apple's libc++ gates std::jthread and std::stop_token behind vendor availability
+# annotations that vary across Xcode/SDK versions. _LIBCPP_DISABLE_AVAILABILITY
+# is the documented way to suppress these guards so all C++20 features are visible
+# regardless of which SDK the CI runner uses.
+if(APPLE)
+    target_compile_definitions(DbConnectionPool INTERFACE _LIBCPP_DISABLE_AVAILABILITY)
+endif()
+
 include(CTest)
 if (PROJECT_IS_TOP_LEVEL AND BUILD_TESTING)
     add_subdirectory(test)

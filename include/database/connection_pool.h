@@ -49,7 +49,6 @@ namespace Core::Database {
         std::shared_ptr<ConnectionFactory> m_factory;
         std::vector<std::jthread> m_threads;
     };
-
 } // namespace Core::Database
 
 #include "connection_pool_impl.h"
