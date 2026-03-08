@@ -35,18 +35,22 @@ jobs:
             cc: cl
             cxx: cl
 
-          # macOS Clang
+          # macOS Apple Clang
           - os: macos-latest
             compiler: apple-clang
             cc: clang
             cxx: clang++
-            build_type: Release
 
-          # macOS GCC
+          # macOS GCC (via Homebrew)
           - os: macos-latest
-            compiler: apple-clang
-            cc: gcc
-            cxx: g++
+            compiler: gcc
+            cc: gcc-14
+            cxx: g++-14
+
+          # macOS LLVM Clang (via Homebrew) — paths resolved at configured time
+          - os: macos-latest
+            compiler: clang
+            flag: libc++
 
         exclude:
           - os: ubuntu-24.04
@@ -86,14 +90,24 @@ jobs:
       - name: Configure
         shell: bash
         run: |
+          CC_COMPILER="${{ matrix.cc }}"
+          CXX_COMPILER="${{ matrix.cxx }}"
           CLANG_CXX_FLAGS=""
+
+          # Resolve Homebrew LLVM paths on macOS (not available as matrix values)
+          if [ "${{ runner.os }}" = "macOS" ] && [ "${{ matrix.compiler }}" = "clang" ]; then
+            LLVM_PREFIX="$(brew --prefix llvm)"
+            CC_COMPILER="${LLVM_PREFIX}/bin/clang"
+            CXX_COMPILER="${LLVM_PREFIX}/bin/clang++"
+          fi
+
           if [ "${{ matrix.compiler }}" = "clang" ]; then
             CLANG_CXX_FLAGS="-DCMAKE_CXX_FLAGS=-stdlib=${{ matrix.flag }}"
           fi
-          
+
           cmake -S . -B build -G Ninja \
-            -DCMAKE_C_COMPILER=${{ matrix.cc }} \
-            -DCMAKE_CXX_COMPILER=${{ matrix.cxx }} \
+            -DCMAKE_C_COMPILER="${CC_COMPILER}" \
+            -DCMAKE_CXX_COMPILER="${CXX_COMPILER}" \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             ${CLANG_CXX_FLAGS}
 
