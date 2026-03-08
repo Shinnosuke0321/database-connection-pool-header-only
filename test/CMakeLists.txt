@@ -28,9 +28,9 @@ target_link_libraries(IntrusivePtr_tests PRIVATE
         GTest::gtest_main
 )
 
-# Apply sanitizer only for supported compilers
+# Apply sanitizer only for supported compilers (Homebrew GCC on macOS does not ship ASan)
 if (NOT SANITIZER_TYPE STREQUAL "none")
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU" AND NOT APPLE)
 
         foreach(target
                 DbConnectionPool_tests
