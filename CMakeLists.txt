@@ -1,13 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
-
-# Must be set before project() so CMake reads it during compiler/platform detection.
-# std::jthread is gated behind a macOS availability guard in Apple's libc++;
-# without this, CI defaults to an old deployment target (e.g. 11.0) that hides it.
-# Set unconditionally — CMake ignores this on non-Apple platforms.
-set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0" CACHE STRING "Minimum macOS deployment target")
-
 project(DbConnectionPool VERSION 1.0.0 LANGUAGES CXX)
 
+set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0" CACHE STRING "Minimum macOS deployment target")
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -22,14 +16,6 @@ target_include_directories(DbConnectionPool INTERFACE
 add_library(DbConnectionPool::DbConnectionPool ALIAS DbConnectionPool)
 
 target_compile_features(DbConnectionPool INTERFACE cxx_std_23)
-
-# Apple's libc++ gates std::jthread and std::stop_token behind vendor availability
-# annotations that vary across Xcode/SDK versions. _LIBCPP_DISABLE_AVAILABILITY
-# is the documented way to suppress these guards so all C++20 features are visible
-# regardless of which SDK the CI runner uses.
-if(APPLE)
-    target_compile_definitions(DbConnectionPool INTERFACE _LIBCPP_DISABLE_AVAILABILITY)
-endif()
 
 include(CTest)
 if (PROJECT_IS_TOP_LEVEL AND BUILD_TESTING)
