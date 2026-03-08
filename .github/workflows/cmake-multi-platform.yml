@@ -48,6 +48,8 @@ jobs:
 
           - os: macos-latest
             compiler: apple-clang
+            cc: clang
+            cxx: clang++
             flag: libc++
 
         exclude:
