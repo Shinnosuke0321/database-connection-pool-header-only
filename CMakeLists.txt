@@ -3,9 +3,8 @@ cmake_minimum_required(VERSION 3.28)
 # Must be set before project() so CMake reads it during compiler/platform detection.
 # std::jthread is gated behind a macOS availability guard in Apple's libc++;
 # without this, CI defaults to an old deployment target (e.g. 11.0) that hides it.
-if(APPLE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0" CACHE STRING "Minimum macOS deployment target")
-endif()
+# Set unconditionally — CMake ignores this on non-Apple platforms.
+set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0" CACHE STRING "Minimum macOS deployment target")
 
 project(DbConnectionPool VERSION 1.0.0 LANGUAGES CXX)
 

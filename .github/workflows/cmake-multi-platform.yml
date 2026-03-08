@@ -94,6 +94,13 @@ jobs:
           CXX_COMPILER="${{ matrix.cxx }}"
           CLANG_CXX_FLAGS=""
 
+          # Set macOS deployment target explicitly — CMake's CACHE default in CMakeLists.txt
+          # is ignored when APPLE is not yet defined (before project()), so enforce it here.
+          DEPLOYMENT_TARGET_FLAG=""
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            DEPLOYMENT_TARGET_FLAG="-DCMAKE_OSX_DEPLOYMENT_TARGET=15.0"
+          fi
+
           # Resolve Homebrew LLVM paths on macOS (not available as matrix values)
           SYSROOT_FLAG=""
           if [ "${{ runner.os }}" = "macOS" ] && [ "${{ matrix.compiler }}" = "clang" ]; then
@@ -113,7 +120,8 @@ jobs:
             -DCMAKE_CXX_COMPILER="${CXX_COMPILER}" \
             -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
             ${CLANG_CXX_FLAGS} \
-            ${SYSROOT_FLAG}
+            ${SYSROOT_FLAG} \
+            ${DEPLOYMENT_TARGET_FLAG}
 
       - name: Build
         run: cmake --build build
