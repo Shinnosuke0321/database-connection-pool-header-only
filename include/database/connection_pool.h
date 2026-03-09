@@ -9,6 +9,7 @@
 #include <semaphore>
 #include <vector>
 #include <thread>
+#include <stop_token>
 #include "connection.h"
 #include "connection_factory.h"
 #include "connection_manager.h"
