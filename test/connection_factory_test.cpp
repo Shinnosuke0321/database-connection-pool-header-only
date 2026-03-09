@@ -14,22 +14,6 @@ namespace {
     struct ConnA : IConnection { int tag = 1; };
     struct ConnB : IConnection { int tag = 2; };
 }
-class Timer {
-    public:
-        Timer() {
-            m_start = std::chrono::steady_clock::now();
-        }
-        ~Timer() {
-            const auto end_point = std::chrono::high_resolution_clock::now();
-            const auto start = std::chrono::time_point_cast<std::chrono::microseconds>(m_start).time_since_epoch().count();
-            const auto end = std::chrono::time_point_cast<std::chrono::microseconds>(end_point).time_since_epoch().count();
-            auto duration = (end - start);
-            double duration_ms = static_cast<double>(duration) * 0.001;
-            std::cout << "Elapsed time: " << duration_ms << " ms" << std::endl;
-        }
-private:
-    std::chrono::time_point<std::chrono::high_resolution_clock> m_start;
-};
 
 class ConnectionFactoryTest : public ::testing::Test {
 protected:
@@ -106,7 +90,6 @@ TEST_F(ConnectionFactoryTest, FactoryCalledEachTime_NotCached) {
 // create_connection now copies the factory function while holding the shared lock,
 // so concurrent writers replacing the entry cannot cause a dangling-reference crash.
 TEST_F(ConnectionFactoryTest, ConcurrentReaderWriter_NoDataRace) {
-    Timer t;
     factory.register_factory<ConnA>([]() -> ConnectionResult {
         return std::unique_ptr<IConnection>(new ConnA{});
     });

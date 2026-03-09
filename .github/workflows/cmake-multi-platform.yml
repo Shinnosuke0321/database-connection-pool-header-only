@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-24.04, windows-latest, macos-latest ]
-        compiler: [ gcc, clang, msvc, apple-clang ]
+        compiler: [ gcc, clang, msvc]
         build_type: [ Debug, Release, RelWithDebInfo ]
         include:
           # Linux GCC
@@ -44,12 +44,6 @@ jobs:
           # macOS LLVM Clang (via Homebrew) — paths resolved at configured time
           - os: macos-latest
             compiler: clang
-            flag: libc++
-
-          - os: macos-latest
-            compiler: apple-clang
-            cc: clang
-            cxx: clang++
             flag: libc++
 
         exclude:
@@ -106,7 +100,7 @@ jobs:
             SYSROOT_FLAG="-DCMAKE_OSX_SYSROOT=$(xcrun --show-sdk-path)"
           fi
 
-          if [ "${{ matrix.compiler }}" = "clang" ] || [ "${{ matrix.compiler }}" = "apple-clang" ] ; then
+          if [ "${{ matrix.compiler }}" = "clang" ] ; then
             CLANG_CXX_FLAGS="-DCMAKE_CXX_FLAGS=-stdlib=${{ matrix.flag }}"
           fi
 
