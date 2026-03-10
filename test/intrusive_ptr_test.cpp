@@ -70,11 +70,16 @@ TEST(IntrusivePreTest, SingleThread_1) {
     origin = origin;
     ASSERT_EQ(origin->ref_count(), 1);
     auto copied_res = origin;
+    ASSERT_EQ(origin.get(), copied_res.get());
+    ASSERT_EQ(origin->ref_count(), 2);
     ASSERT_EQ(copied_res->ref_count(), 2);
     auto moved_res = std::move(copied_res);
+    ASSERT_EQ(origin.get(), moved_res.get());
+    ASSERT_EQ(origin->ref_count(), 2);
     ASSERT_EQ(moved_res->ref_count(), 2);
     ASSERT_EQ(copied_res.get(), nullptr);
     moved_res.reset();
+    ASSERT_EQ(moved_res.get(), nullptr);
     ASSERT_EQ(origin->ref_count(), 1);
     origin.reset();
     ASSERT_EQ(count.load(std::memory_order_relaxed), 1);
