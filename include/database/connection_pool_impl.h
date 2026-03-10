@@ -144,7 +144,7 @@ namespace Core::Database {
     template<class T>
     requires std::derived_from<T, IConnection>
     ConnectionManager<T> ConnectionPool<T>::wrap_connection(std::unique_ptr<T> c) noexcept {
-        std_ex::intrusive_ptr<ConnectionPool> instance = this->intrusive_from_this();
+        smart_ptr::intrusive_ptr<ConnectionPool> instance = this->intrusive_from_this();
 
         auto releaser = [instance](std::unique_ptr<T> returned_conn) noexcept {
             if (!returned_conn)
