@@ -15,7 +15,7 @@
 #include "connection_manager.h"
 #include <core/memory/intrusive_ptr.h>
 
-namespace Core::Database {
+namespace core::Database {
     struct PoolConfig {
         std::size_t max_size = std::thread::hardware_concurrency();
         std::size_t init_size = 10;

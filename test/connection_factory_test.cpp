@@ -8,7 +8,7 @@
 #include <thread>
 #include <chrono>
 
-using namespace Core::Database;
+using namespace core::Database;
 
 namespace {
     struct ConnA : IConnection { int tag = 1; };

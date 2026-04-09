@@ -8,12 +8,12 @@
 #include <format>
 #include <core/error/base_error.h>
 
-namespace Core::Database {
+namespace core::Database {
     struct IConnection {
         virtual ~IConnection() = default;
     };
 
-    struct ConnectionError: BaseError {
+    struct ConnectionError: error_base {
         enum class Type {
             ConnectionFailed, MissingConfig, FactoryNotRegistered, Timeout, SocketFailed, AuthFailed
         };

@@ -4,7 +4,7 @@
 
 #pragma once
 
-namespace Core::Database {
+namespace core::Database {
 
     template<class T>
     requires std::derived_from<T, IConnection>

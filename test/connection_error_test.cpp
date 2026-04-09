@@ -5,7 +5,7 @@
 #include <database/connection.h>
 #include <string>
 
-using namespace Core::Database;
+using namespace core::Database;
 
 TEST(ConnectionErrorTest, AllSixFactoryMethods_ReturnCorrectCode) {
     ASSERT_EQ(ConnectionError::ConnectionFailed("msg").get_code(),    ConnectionError::Type::ConnectionFailed);

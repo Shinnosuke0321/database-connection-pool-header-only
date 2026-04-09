@@ -4,9 +4,10 @@
 #pragma once
 #include <string>
 
-namespace Core {
-    struct BaseError {
-        virtual ~BaseError() = default;
+namespace core {
+    class error_base {
+    public:
+        virtual ~error_base() = default;
         virtual std::string to_str() const noexcept = 0;
     };
 }

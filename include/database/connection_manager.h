@@ -6,7 +6,7 @@
 #include "connection.h"
 #include <functional>
 
-namespace Core::Database {
+namespace core::Database {
     template<class T>
     requires std::derived_from<T, IConnection>
     class ConnectionManager {

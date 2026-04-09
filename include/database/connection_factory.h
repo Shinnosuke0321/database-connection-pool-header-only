@@ -11,7 +11,7 @@
 #include <functional>
 #include <cstring>
 
-namespace Core::Database {
+namespace core::Database {
     class ConnectionFactory {
     public:
         explicit ConnectionFactory() = default;
