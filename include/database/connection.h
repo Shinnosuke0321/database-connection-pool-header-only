@@ -4,7 +4,7 @@
 #pragma once
 #include <expected>
 #include <memory>
-#include <core/error/base_error.h>
+#include <core/error/connection_error.h>
 
 namespace core::database {
     struct IConnection {

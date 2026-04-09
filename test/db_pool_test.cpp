@@ -119,7 +119,7 @@ TEST(ConnectionPoolTest, TimeoutOnExhaustedPool) {
     // Pool exhausted; second acquire with zero timeout should return Timeout
     auto r2 = pool->acquire(std::chrono::seconds{0});
     ASSERT_FALSE(r2.has_value());
-    ASSERT_EQ(r2.error().get_code(), core::connection_error::type::Timeout);
+    ASSERT_EQ(r2.error().get_code(), core::connection_errc::Timeout);
 }
 
 int main(int argc, char **argv) {
