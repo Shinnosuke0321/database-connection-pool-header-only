@@ -118,7 +118,7 @@ namespace core::database {
 
             const auto now = clock::now();
             if (now >= deadline) {
-                return std::unexpected(connection_error::Timeout("Timed out waiting for a connection"));
+                return std::unexpected(CONNECTION_ERROR(Timeout, "Timed out waiting for a connection"));
             }
             const auto remaining = std::chrono::duration_cast<std::chrono::milliseconds>(deadline - now);
 
@@ -142,7 +142,7 @@ namespace core::database {
                 }
                 return wrap_connection(std::move(result.value()));
             }
-            return std::unexpected(connection_error::Timeout("Timed out waiting for a connection"));
+            return std::unexpected(CONNECTION_ERROR(Timeout, "Timed out waiting for a connection"));
         }
     }
 

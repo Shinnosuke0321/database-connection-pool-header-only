@@ -50,9 +50,8 @@ namespace core::database {
                 std::shared_lock lock(m_shared_mutex);
                 const auto it = m_factories.find(type_id);
                 if (it == m_factories.end()) {
-                    char buffer[35] = "No factory registered for type ";
-                    strcat(buffer, type_id.name());
-                    return std::unexpected(connection_error::FactoryNotRegistered(buffer));
+                    std::string message = std::format("No factory registered for type {}", type_id.name());
+                    return std::unexpected(CONNECTION_ERROR(FactoryNotRegistered, std::move(message)));
                 };
                 factory = it->second;
             }

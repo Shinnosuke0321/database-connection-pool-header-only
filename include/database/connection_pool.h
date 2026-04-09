@@ -24,7 +24,7 @@ namespace core::database {
 
     template<class T>
     requires std::derived_from<T, IConnection>
-    class ConnectionPool: public core::ref_counted<ConnectionPool<T>> {
+    class ConnectionPool: public ref_counted<ConnectionPool<T>> {
     public:
         using SharedFactory = std::shared_ptr<ConnectionFactory>;
         using AcquireResult = std::expected<ConnectionManager<T>, connection_error>;

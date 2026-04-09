@@ -33,12 +33,12 @@ TEST_F(ConnectionFactoryTest, CreateAfterRegistration_Succeeds) {
 
 TEST_F(ConnectionFactoryTest, FactoryReturningError_Propagates) {
     factory.register_factory<ConnA>([]() -> ConnectionResult {
-        return std::unexpected(core::connection_error::AuthFailed("bad creds"));
+        return std::unexpected(CONNECTION_ERROR(AuthFailed, "bad creds"));
     });
 
     auto result = factory.create_connection<ConnA>();
     ASSERT_FALSE(result.has_value());
-    ASSERT_EQ(result.error().get_code(), core::connection_error::type::AuthFailed);
+    ASSERT_EQ(result.error().get_code(), core::connection_errc::AuthFailed);
 }
 
 TEST_F(ConnectionFactoryTest, TwoDistinctTypes_BothWork) {

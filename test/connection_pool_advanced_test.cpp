@@ -86,7 +86,7 @@ TEST_F(PoolFeeder, Acquire_Timeout_WhenPoolExhausted) {
     // Pool exhausted; acquire with zero timeout should return Timeout immediately
     auto r3 = pool->acquire(std::chrono::seconds{0});
     ASSERT_FALSE(r3.has_value());
-    ASSERT_EQ(r3.error().get_code(), core::connection_error::type::Timeout);
+    ASSERT_EQ(r3.error().get_code(), core::connection_errc::Timeout);
 }
 
 TEST_F(PoolFeeder, Acquire_ConnectionReturned_IsReused) {
@@ -116,7 +116,7 @@ TEST_F(PoolFeeder, Acquire_FactoryFailure_ReturnsError) {
     // Override factory with one that always fails
     auto fail_factory = std::make_shared<core::database::ConnectionFactory>();
     fail_factory->register_factory<FakeConn>([]() -> core::database::ConnectionResult {
-        return std::unexpected(core::connection_error::AuthFailed("injected failure"));
+        return std::unexpected(CONNECTION_ERROR(AuthFailed, "injected failure"));
     });
 
     core::database::PoolConfig cfg;
@@ -128,7 +128,7 @@ TEST_F(PoolFeeder, Acquire_FactoryFailure_ReturnsError) {
     auto res = pool->acquire();
     ASSERT_FALSE(res.has_value());
     // Must be the factory's error, not a timeout
-    ASSERT_EQ(res.error().get_code(), core::connection_error::type::AuthFailed);
+    ASSERT_EQ(res.error().get_code(), core::connection_errc::AuthFailed);
 }
 
 TEST_F(PoolFeeder, InvalidConfig_EagerWithInitGtMax_FallsToLazy) {
