@@ -5,50 +5,50 @@
 #include <database/connection.h>
 #include <string>
 
-using namespace core::Database;
+using namespace core::database;
 
 TEST(ConnectionErrorTest, AllSixFactoryMethods_ReturnCorrectCode) {
-    ASSERT_EQ(ConnectionError::ConnectionFailed("msg").get_code(),    ConnectionError::Type::ConnectionFailed);
-    ASSERT_EQ(ConnectionError::MissingConfig("msg").get_code(),       ConnectionError::Type::MissingConfig);
-    ASSERT_EQ(ConnectionError::FactoryNotRegistered("msg").get_code(),ConnectionError::Type::FactoryNotRegistered);
-    ASSERT_EQ(ConnectionError::Timeout("msg").get_code(),             ConnectionError::Type::Timeout);
-    ASSERT_EQ(ConnectionError::SocketFailed("msg").get_code(),        ConnectionError::Type::SocketFailed);
-    ASSERT_EQ(ConnectionError::AuthFailed("msg").get_code(),          ConnectionError::Type::AuthFailed);
+    ASSERT_EQ(core::connection_error::ConnectionFailed("msg").get_code(),    core::connection_error::type::ConnectionFailed);
+    ASSERT_EQ(core::connection_error::MissingConfig("msg").get_code(),       core::connection_error::type::MissingConfig);
+    ASSERT_EQ(core::connection_error::FactoryNotRegistered("msg").get_code(),core::connection_error::type::FactoryNotRegistered);
+    ASSERT_EQ(core::connection_error::Timeout("msg").get_code(),             core::connection_error::type::Timeout);
+    ASSERT_EQ(core::connection_error::SocketFailed("msg").get_code(),        core::connection_error::type::SocketFailed);
+    ASSERT_EQ(core::connection_error::AuthFailed("msg").get_code(),          core::connection_error::type::AuthFailed);
 }
 
 TEST(ConnectionErrorTest, ToStr_ContainsTypeAndMessage) {
     {
-        auto err = ConnectionError::ConnectionFailed("conn fail msg");
+        auto err = core::connection_error::ConnectionFailed("conn fail msg");
         auto s = err.to_str();
         ASSERT_NE(s.find("ConnectionFailed"), std::string::npos);
         ASSERT_NE(s.find("conn fail msg"), std::string::npos);
     }
     {
-        auto err = ConnectionError::MissingConfig("cfg msg");
+        auto err = core::connection_error::MissingConfig("cfg msg");
         auto s = err.to_str();
         ASSERT_NE(s.find("MissingConfig"), std::string::npos);
         ASSERT_NE(s.find("cfg msg"), std::string::npos);
     }
     {
-        auto err = ConnectionError::FactoryNotRegistered("factory msg");
+        auto err = core::connection_error::FactoryNotRegistered("factory msg");
         auto s = err.to_str();
         ASSERT_NE(s.find("FactoryNotRegistered"), std::string::npos);
         ASSERT_NE(s.find("factory msg"), std::string::npos);
     }
     {
-        auto err = ConnectionError::Timeout("timeout msg");
+        auto err = core::connection_error::Timeout("timeout msg");
         auto s = err.to_str();
         ASSERT_NE(s.find("Timeout"), std::string::npos);
         ASSERT_NE(s.find("timeout msg"), std::string::npos);
     }
     {
-        auto err = ConnectionError::SocketFailed("socket msg");
+        auto err = core::connection_error::SocketFailed("socket msg");
         auto s = err.to_str();
         ASSERT_NE(s.find("SocketFailed"), std::string::npos);
         ASSERT_NE(s.find("socket msg"), std::string::npos);
     }
     {
-        auto err = ConnectionError::AuthFailed("auth msg");
+        auto err = core::connection_error::AuthFailed("auth msg");
         auto s = err.to_str();
         ASSERT_NE(s.find("AuthFailed"), std::string::npos);
         ASSERT_NE(s.find("auth msg"), std::string::npos);
@@ -56,15 +56,15 @@ TEST(ConnectionErrorTest, ToStr_ContainsTypeAndMessage) {
 }
 
 TEST(ConnectionErrorTest, ToStr_EmptyMessage_NoFormatPanic) {
-    auto err = ConnectionError::Timeout("");
+    auto err = core::connection_error::Timeout("");
     const auto s = err.to_str();
     ASSERT_FALSE(s.empty());
     ASSERT_NE(s.find("Timeout"), std::string::npos);
 }
 
 TEST(ConnectionErrorTest, GetCode_IsCallableOnConst) {
-    const auto err = ConnectionError::AuthFailed("x");
-    ASSERT_EQ(err.get_code(), ConnectionError::Type::AuthFailed);
+    const auto err = core::connection_error::AuthFailed("x");
+    ASSERT_EQ(err.get_code(), core::connection_error::type::AuthFailed);
 }
 
 int main(int argc, char** argv) {
