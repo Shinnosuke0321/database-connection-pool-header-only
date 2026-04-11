@@ -85,5 +85,5 @@ namespace core::error {
     using base = typed_error; using base::base; \
     static std::string_view category_name() noexcept { return #name; }
 
-#define MAKE_UNEXPECTED_ERROR(category_class, type, message) \
-    category_class{type, #type, message}
+#define RETURN_UNEXPECTED_ERROR(category_class, type, message) \
+    return std::unexpected(category_class{type, #type, message})
