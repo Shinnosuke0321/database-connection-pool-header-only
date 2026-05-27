@@ -25,6 +25,10 @@ jobs:
           - os: macos-latest
             preset: macos-clang-release
           - os: macos-latest
+            preset: macos-apple-clang-debug
+          - os: macos-latest
+            preset: macos-apple-clang-release
+          - os: macos-latest
             preset: macos-gcc-debug
           - os: macos-latest
             preset: macos-gcc-release
