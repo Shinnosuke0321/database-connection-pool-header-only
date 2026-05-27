@@ -25,10 +25,10 @@ TEST(ConnectionPoolTest, PoolTest) {
         return std::unique_ptr<database::IConnection>(new FakeConn{});
     });
 
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = true;
 
-    auto pool = smart_ptr::make_intrusive<database::ConnectionPool<FakeConn>>(factory, cfg);
+    auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
     pool->wait_for_warmup();
     ASSERT_EQ(pool->ref_count(), 1);
     {
@@ -55,12 +55,12 @@ TEST(ConnectionPoolTest, LazyPool_BasicAcquire) {
         return std::unique_ptr<database::IConnection>(new FakeConn{});
     });
 
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = false;
     cfg.init_size = 2;
     cfg.max_size = 4;
 
-    auto pool = smart_ptr::make_intrusive<database::ConnectionPool<FakeConn>>(factory, cfg);
+    auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
     ASSERT_EQ(pool->ref_count(), 1u);
     {
         auto res = pool->acquire();
@@ -78,12 +78,12 @@ TEST(ConnectionPoolTest, MultipleAcquires_UpToMaxSize) {
         return std::unique_ptr<database::IConnection>(new FakeConn{});
     });
 
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 3;
 
-    auto pool = smart_ptr::make_intrusive<database::ConnectionPool<FakeConn>>(factory, cfg);
+    auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
     {
         auto r1 = pool->acquire();
         auto r2 = pool->acquire();
@@ -106,12 +106,12 @@ TEST(ConnectionPoolTest, TimeoutOnExhaustedPool) {
         return std::unique_ptr<database::IConnection>(new FakeConn{});
     });
 
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 1;
 
-    auto pool = smart_ptr::make_intrusive<database::ConnectionPool<FakeConn>>(factory, cfg);
+    auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
     auto r1 = pool->acquire();
     ASSERT_TRUE(r1.has_value());
     auto m1 = std::move(r1.value());

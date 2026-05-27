@@ -9,19 +9,19 @@
 namespace database {
     template<class T>
     requires std::derived_from<T, IConnection>
-    class ConnectionManager {
+    class connection_manager {
     public:
-        using Releaser = std::function<void(std::unique_ptr<T>)>;
+        using releaser_t = std::function<void(std::unique_ptr<T>)>;
 
-        explicit ConnectionManager(std::unique_ptr<T> connection, Releaser&& releaser)
+        explicit connection_manager(std::unique_ptr<T> connection, releaser_t&& releaser)
             : m_connection(std::move(connection)), m_releaser(std::move(releaser)) {}
 
-        ConnectionManager(ConnectionManager&& other) noexcept
+        connection_manager(connection_manager&& other) noexcept
         : m_connection(std::move(other.m_connection)),
           m_releaser(std::move(other.m_releaser)) {
             other.m_releaser = nullptr;
         }
-        ConnectionManager& operator=(ConnectionManager&& other) noexcept {
+        connection_manager& operator=(connection_manager&& other) noexcept {
             if (this == &other) {
                 return *this;
             }
@@ -31,10 +31,10 @@ namespace database {
             return *this;
         };
 
-        ConnectionManager(ConnectionManager const&) = delete;
-        ConnectionManager& operator=(ConnectionManager const&) = delete;
+        connection_manager(connection_manager const&) = delete;
+        connection_manager& operator=(connection_manager const&) = delete;
 
-        ~ConnectionManager() {
+        ~connection_manager() {
             release();
         }
 
@@ -51,6 +51,6 @@ namespace database {
         }
     private:
         std::unique_ptr<T> m_connection;
-        Releaser m_releaser;
+        releaser_t m_releaser;
     };
 }
