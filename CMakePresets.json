@@ -139,6 +139,7 @@
       "name": "macos-apple-clang-debug",
       "inherits": "base",
       "displayName": "macOS Apple Clang Debug",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/macos-apple-clang.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       },
