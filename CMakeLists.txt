@@ -22,7 +22,6 @@ if (PROJECT_IS_TOP_LEVEL AND BUILD_TESTING)
     add_subdirectory(test)
 endif ()
 
-
 include(GNUInstallDirs)
 
 install(TARGETS DbConnectionPool

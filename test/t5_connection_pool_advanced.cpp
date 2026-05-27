@@ -31,34 +31,30 @@ protected:
                 new FakeConn{conn_id_counter.fetch_add(1)});
         });
     }
-
-    auto make_pool(database::PoolConfig cfg) {
-        return smart_ptr::make_intrusive<database::ConnectionPool<FakeConn>>(factory, cfg);
-    }
 };
 
 TEST_F(PoolFeeder, LazyMode_PoolReadyImmediately) {
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = false;
     cfg.init_size = 2;
     cfg.max_size = 4;
 
-    auto pool = make_pool(cfg);
+    auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
     // No wait_for_warmup() needed — lazy mode sets pool_ready in constructor
     auto res = pool->acquire();
     ASSERT_TRUE(res.has_value());
 }
 
 TEST_F(PoolFeeder, LazyMode_CanAcquireUpToMaxSize) {
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 6;
 
-    auto pool = make_pool(cfg);
+    auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
 
     // Acquire all 6 slots and hold them simultaneously
-    std::vector<database::ConnectionManager<FakeConn>> managers;
+    std::vector<database::connection_manager<FakeConn>> managers;
     managers.reserve(6);
     for (int i = 0; i < 6; ++i) {
         auto res = pool->acquire();
@@ -69,12 +65,12 @@ TEST_F(PoolFeeder, LazyMode_CanAcquireUpToMaxSize) {
 }
 
 TEST_F(PoolFeeder, Acquire_Timeout_WhenPoolExhausted) {
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 2;
 
-    auto pool = make_pool(cfg);
+    auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
 
     auto r1 = pool->acquire();
     auto r2 = pool->acquire();
@@ -84,18 +80,18 @@ TEST_F(PoolFeeder, Acquire_Timeout_WhenPoolExhausted) {
     auto m2 = std::move(r2.value());
 
     // Pool exhausted; acquire with zero timeout should return Timeout immediately
-    auto r3 = pool->acquire(std::chrono::seconds{0});
+    auto r3 = pool->acquire();
     ASSERT_FALSE(r3.has_value());
     ASSERT_EQ(r3.error().get_code(), database::conn_err_types::Timeout);
 }
 
 TEST_F(PoolFeeder, Acquire_ConnectionReturned_IsReused) {
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 1;
 
-    auto pool = make_pool(cfg);
+    auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
 
     FakeConn* first_ptr = nullptr;
     {
@@ -121,12 +117,12 @@ TEST_F(PoolFeeder, Acquire_FactoryFailure_ReturnsError) {
         RETURN_UNEXPECTED_ERROR(connection_error, AuthFailed, "injected failure");
     });
 
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 2;
 
-    auto pool = smart_ptr::make_intrusive<database::ConnectionPool<FakeConn>>(fail_factory, cfg);
+    auto pool = database::connection_pool<FakeConn>::create(fail_factory, cfg);
     auto res = pool->acquire();
     ASSERT_FALSE(res.has_value());
     // Must be the factory's error, not a timeout
@@ -135,28 +131,24 @@ TEST_F(PoolFeeder, Acquire_FactoryFailure_ReturnsError) {
 
 TEST_F(PoolFeeder, InvalidConfig_EagerWithInitGtMax_FallsToLazy) {
     // init_size > max_size with is_eager=true: condition fails, constructor falls to lazy path
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = true;
     cfg.init_size = 10;
     cfg.max_size = 5;
 
-    auto pool = make_pool(cfg);
+    auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
     // Pool should be immediately ready (lazy path set m_pool_ready = true)
     auto res = pool->acquire();
     ASSERT_TRUE(res.has_value());
 }
 
-// ---------------------------------------------------------------------------
-// Suite: ConnectionPoolLifetimeTest
-// ---------------------------------------------------------------------------
-
 TEST_F(PoolFeeder, RefCountTracking_LazyMode) {
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = false;
     cfg.init_size = 1;
     cfg.max_size = 2;
 
-    auto pool = make_pool(cfg);
+    auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
     ASSERT_EQ(pool->ref_count(), 1u);
     {
         auto res = pool->acquire();
@@ -169,14 +161,14 @@ TEST_F(PoolFeeder, RefCountTracking_LazyMode) {
 }
 
 TEST_F(PoolFeeder, PoolOutlivedByManager_NoUseAfterFree) {
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 1;
 
-    std::optional<database::ConnectionManager<FakeConn>> mgr_holder;
+    std::optional<database::connection_manager<FakeConn>> mgr_holder;
     {
-        auto pool = make_pool(cfg);
+        auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
         auto res = pool->acquire();
         ASSERT_TRUE(res.has_value());
         mgr_holder.emplace(std::move(res.value()));
@@ -190,17 +182,13 @@ TEST_F(PoolFeeder, PoolOutlivedByManager_NoUseAfterFree) {
     SUCCEED();
 }
 
-// ---------------------------------------------------------------------------
-// Suite: ConnectionPoolConcurrencyTest
-// ---------------------------------------------------------------------------
-
 TEST_F(PoolFeeder, ConcurrentAcquireRelease_NoRefLeak) {
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 8;
 
-    auto pool = make_pool(cfg);
+    auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
     ASSERT_EQ(pool->ref_count(), 1u);
 
     constexpr int kThreads = 32;
@@ -225,12 +213,12 @@ TEST_F(PoolFeeder, ConcurrentAcquireRelease_NoRefLeak) {
 }
 
 TEST_F(PoolFeeder, HighContention_AllAcquiresSucceedOrTimeout) {
-    database::PoolConfig cfg;
+    database::pool_config cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 4;
 
-    auto pool = make_pool(cfg);
+    auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
 
     constexpr int kThreads = 64;
     std::atomic success_count{0};

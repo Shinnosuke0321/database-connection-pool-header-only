@@ -18,7 +18,7 @@ TEST(ConnectionManagerTest, Destructor_InvokesReleaser) {
     bool released = false;
     {
         auto conn = std::make_unique<SimpleConn>();
-        ConnectionManager<SimpleConn> mgr(
+        connection_manager<SimpleConn> mgr(
             std::move(conn),
             [&released](std::unique_ptr<SimpleConn>) { released = true; });
     }
@@ -31,7 +31,7 @@ TEST(ConnectionManagerTest, Destructor_PassesConnectionToReleaser) {
     {
         auto conn = std::make_unique<SimpleConn>();
         conn->destroyed = &destroyed;
-        ConnectionManager<SimpleConn> mgr(
+        connection_manager<SimpleConn> mgr(
             std::move(conn),
             [&captured_ptr](std::unique_ptr<SimpleConn> c) {
                 captured_ptr = c.get(); // take ownership; 'c' destructs at end of lambda
@@ -45,7 +45,7 @@ TEST(ConnectionManagerTest, Destructor_PassesConnectionToReleaser) {
 TEST(ConnectionManagerTest, MoveConstructor_OriginalReleaserNulled) {
     int fire_count = 0;
     auto make_mgr = [&] {
-        return ConnectionManager<SimpleConn>(
+        return connection_manager<SimpleConn>(
             std::make_unique<SimpleConn>(),
             [&fire_count](std::unique_ptr<SimpleConn>) { ++fire_count; });
     };
@@ -64,12 +64,12 @@ TEST(ConnectionManagerTest, MoveConstructor_OriginalReleaserNulled) {
 TEST(ConnectionManagerTest, MoveAssignment_TransfersOwnership) {
     int count_a = 0, count_b = 0;
 
-    auto a = ConnectionManager<SimpleConn>(
+    auto a = connection_manager<SimpleConn>(
         std::make_unique<SimpleConn>(),
         [&count_a](std::unique_ptr<SimpleConn>) { ++count_a; });
 
     {
-        auto b = ConnectionManager<SimpleConn>(
+        auto b = connection_manager<SimpleConn>(
             std::make_unique<SimpleConn>(),
             [&count_b](std::unique_ptr<SimpleConn>) { ++count_b; });
 
@@ -96,11 +96,11 @@ TEST(ConnectionManagerTest, MoveAssignment_TransfersOwnership) {
 TEST(ConnectionManagerTest, MoveAssignment_FiredOnDestruction) {
     int count = 0;
     {
-        ConnectionManager<SimpleConn> a(
+        connection_manager<SimpleConn> a(
             std::make_unique<SimpleConn>(),
             [](std::unique_ptr<SimpleConn>) {});
 
-        ConnectionManager<SimpleConn> b(
+        connection_manager<SimpleConn> b(
             std::make_unique<SimpleConn>(),
             [&count](std::unique_ptr<SimpleConn>) { ++count; });
 
@@ -113,7 +113,7 @@ TEST(ConnectionManagerTest, MoveAssignment_FiredOnDestruction) {
 TEST(ConnectionManagerTest, SelfMoveAssignment_IsNoOp) {
     int fire_count = 0;
     {
-        auto mgr = ConnectionManager<SimpleConn>(
+        auto mgr = connection_manager<SimpleConn>(
             std::make_unique<SimpleConn>(),
             [&fire_count](std::unique_ptr<SimpleConn>) { ++fire_count; });
         mgr = std::move(mgr); // self-move — guarded by this == &other check
@@ -128,7 +128,7 @@ TEST(ConnectionManagerTest, NullReleaser_ConnectionDeletedByManager) {
         auto conn = std::make_unique<SimpleConn>();
         conn->destroyed = &destroyed;
         // Pass empty Releaser — release() will call m_connection.reset() instead
-        ConnectionManager mgr(std::move(conn), ConnectionManager<SimpleConn>::Releaser{});
+        connection_manager mgr(std::move(conn), connection_manager<SimpleConn>::releaser_t{});
     }
     ASSERT_TRUE(destroyed);
 }
@@ -136,7 +136,7 @@ TEST(ConnectionManagerTest, NullReleaser_ConnectionDeletedByManager) {
 TEST(ConnectionManagerTest, ArrowAndDereferenceOperators) {
     auto conn = std::make_unique<SimpleConn>();
     conn->tag = 7;
-    ConnectionManager<SimpleConn> mgr(
+    connection_manager<SimpleConn> mgr(
         std::move(conn),
         [](std::unique_ptr<SimpleConn>) {});
 

@@ -1,0 +1,303 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 28,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "linux-gcc-debug",
+      "inherits": "base",
+      "displayName": "Linux GCC Debug",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-gcc.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "linux-gcc-release",
+      "inherits": "linux-gcc-debug",
+      "displayName": "Linux GCC Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "linux-gcc-relwithdebinfo",
+      "inherits": "linux-gcc-debug",
+      "displayName": "Linux GCC RelWithDebInfo",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "linux-clang-debug",
+      "inherits": "base",
+      "displayName": "Linux Clang Debug",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/linux-clang.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "linux-clang-release",
+      "inherits": "linux-clang-debug",
+      "displayName": "Linux Clang Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "linux-clang-relwithdebinfo",
+      "inherits": "linux-clang-debug",
+      "displayName": "Linux Clang RelWithDebInfo",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "macos-gcc-debug",
+      "inherits": "base",
+      "displayName": "macOS GCC Debug",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/macos-gcc.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "macos-gcc-release",
+      "inherits": "macos-gcc-debug",
+      "displayName": "macOS GCC Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "macos-gcc-relwithdebinfo",
+      "inherits": "macos-gcc-debug",
+      "displayName": "macOS GCC RelWithDebInfo",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "macos-clang-debug",
+      "inherits": "base",
+      "displayName": "macOS Homebrew Clang Debug",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/macos-homebrew-clang.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "macos-clang-release",
+      "inherits": "macos-clang-debug",
+      "displayName": "macOS Homebrew Clang Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "macos-clang-relwithdebinfo",
+      "inherits": "macos-clang-debug",
+      "displayName": "macOS Homebrew Clang RelWithDebInfo",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    },
+    {
+      "name": "macos-apple-clang-debug",
+      "inherits": "base",
+      "displayName": "macOS Apple Clang Debug",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/macos-apple-clang.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "macos-apple-clang-release",
+      "inherits": "macos-apple-clang-debug",
+      "displayName": "macOS Apple Clang Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows-msvc-debug",
+      "inherits": "base",
+      "displayName": "Windows MSVC Debug",
+      "toolchainFile": "${sourceDir}/cmake/toolchains/windows-msvc.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "windows-msvc-release",
+      "inherits": "windows-msvc-debug",
+      "displayName": "Windows MSVC Release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows-msvc-relwithdebinfo",
+      "inherits": "windows-msvc-debug",
+      "displayName": "Windows MSVC RelWithDebInfo",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "linux-gcc-debug",
+      "configurePreset": "linux-gcc-debug"
+    },
+    {
+      "name": "linux-gcc-release",
+      "configurePreset": "linux-gcc-release"
+    },
+    {
+      "name": "linux-clang-debug",
+      "configurePreset": "linux-clang-debug"
+    },
+    {
+      "name": "linux-clang-release",
+      "configurePreset": "linux-clang-release"
+    },
+    {
+      "name": "macos-gcc-debug",
+      "configurePreset": "macos-gcc-debug"
+    },
+    {
+      "name": "macos-gcc-release",
+      "configurePreset": "macos-gcc-release"
+    },
+    {
+      "name": "macos-clang-debug",
+      "configurePreset": "macos-clang-debug"
+    },
+    {
+      "name": "macos-clang-release",
+      "configurePreset": "macos-clang-release"
+    },
+    {
+      "name": "macos-apple-clang-debug",
+      "configurePreset": "macos-apple-clang-debug"
+    },
+    {
+      "name": "macos-apple-clang-release",
+      "configurePreset": "macos-apple-clang-release"
+    },
+    {
+      "name": "windows-msvc-debug",
+      "configurePreset": "windows-msvc-debug"
+    },
+    {
+      "name": "windows-msvc-release",
+      "configurePreset": "windows-msvc-release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "linux-gcc-debug",
+      "configurePreset": "linux-gcc-debug",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "linux-gcc-release",
+      "configurePreset": "linux-gcc-release",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "linux-clang-debug",
+      "configurePreset": "linux-clang-debug",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "linux-clang-release",
+      "configurePreset": "linux-clang-release",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "macos-gcc-debug",
+      "configurePreset": "macos-gcc-debug",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "macos-gcc-release",
+      "configurePreset": "macos-gcc-release",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "macos-clang-debug",
+      "configurePreset": "macos-clang-debug",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "macos-clang-release",
+      "configurePreset": "macos-clang-release",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "macos-apple-clang-debug",
+      "configurePreset": "macos-apple-clang-debug",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "macos-apple-clang-release",
+      "configurePreset": "macos-apple-clang-release",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "windows-msvc-debug",
+      "configurePreset": "windows-msvc-debug",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "windows-msvc-release",
+      "configurePreset": "windows-msvc-release",
+      "output": {"outputOnFailure": true}
+    }
+  ]
+}

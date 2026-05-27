@@ -13,7 +13,6 @@ public:
     Resource() {
         std::println("Resource created");
     }
-
     ~Resource() override {
         count.fetch_add(1, std::memory_order_relaxed);
         std::println("Resource destroyed");
@@ -65,7 +64,7 @@ TEST(IntrusivePtrTest, MultiThreads) {
     ASSERT_EQ(count.load(std::memory_order_relaxed), 1);
 }
 
-TEST(IntrusivePreTest, SingleThread_1) {
+TEST(IntrusivePtrTest, SingleThread_1) {
     auto origin = smart_ptr::make_intrusive<Resource>();
     origin = origin;
     ASSERT_EQ(origin->ref_count(), 1);
@@ -85,7 +84,7 @@ TEST(IntrusivePreTest, SingleThread_1) {
     ASSERT_EQ(count.load(std::memory_order_relaxed), 1);
 }
 
-TEST(IntrusivePreTest, SingleThread_2) {
+TEST(IntrusivePtrTest, SingleThread_2) {
     {
         auto origin = smart_ptr::make_intrusive<Resource>();
         {
@@ -111,13 +110,13 @@ public:
     int data = 0;
 };
 
-TEST(IntrusivePreTest, DefaultConstructed_IsNullAndFalse) {
+TEST(IntrusivePtrTest, DefaultConstructed_IsNullAndFalse) {
     smart_ptr::intrusive_ptr<SimpleRef> p;
     ASSERT_EQ(p.get(), nullptr);
     ASSERT_FALSE(static_cast<bool>(p));
 }
 
-TEST(IntrusivePreTest, ResetWithNonNullPtr_IncreasesCount) {
+TEST(IntrusivePtrTest, ResetWithNonNullPtr_IncreasesCount) {
     auto a = smart_ptr::make_intrusive<SimpleRef>();
     ASSERT_EQ(a->ref_count(), 1u);
 
@@ -129,14 +128,14 @@ TEST(IntrusivePreTest, ResetWithNonNullPtr_IncreasesCount) {
     ASSERT_EQ(a->ref_count(), 1u);
 }
 
-TEST(IntrusivePreTest, SelfCopyAssignment_IsNoOp) {
+TEST(IntrusivePtrTest, SelfCopyAssignment_IsNoOp) {
     auto a = smart_ptr::make_intrusive<SimpleRef>();
     ASSERT_EQ(a->ref_count(), 1u);
     a = a; // guarded by this == &other
     ASSERT_EQ(a->ref_count(), 1u);
 }
 
-TEST(IntrusivePreTest, SelfMoveAssignment_IsNoOp) {
+TEST(IntrusivePtrTest, SelfMoveAssignment_IsNoOp) {
     auto a = smart_ptr::make_intrusive<SimpleRef>();
     SimpleRef* raw = a.get();
     a = std::move(a); // guarded by this == &other
@@ -144,14 +143,37 @@ TEST(IntrusivePreTest, SelfMoveAssignment_IsNoOp) {
     ASSERT_EQ(a->ref_count(), 1u);
 }
 
-TEST(IntrusivePreTest, IntrusiveFromThis_IncrementsCount) {
-    auto a = smart_ptr::make_intrusive<SimpleRef>();
-    ASSERT_EQ(a->ref_count(), 1u);
-    {
-        auto b = a->intrusive_from_this(); // increments ref count
-        ASSERT_EQ(a->ref_count(), 2u);
-    } // b destroyed → ref count back to 1
-    ASSERT_EQ(a->ref_count(), 1u);
+class SimpleRef2: public core::ref_counted<SimpleRef2> {
+public:
+    static smart_ptr::intrusive_ptr<SimpleRef2> create_simple_ref2() {
+        return smart_ptr::make_intrusive<SimpleRef2>();
+    }
+    SimpleRef2() {
+        std::println("SimpleRef2 created");
+    }
+
+    void increment_ref_count() const {
+        auto self = this->intrusive_from_this();
+        EXPECT_EQ(self->ref_count(), 2u);
+    }
+
+    void throw_with_intrusive_from_this() const {
+        EXPECT_THROW(this->intrusive_from_this(), std::runtime_error);
+    }
+    ~SimpleRef2() override = default;
+};
+
+TEST(IntrusivePtrTest, IntrusiveFromThis_IncrementsCount) {
+    auto ref2 = SimpleRef2::create_simple_ref2();
+    ASSERT_EQ(ref2->ref_count(), 1u);
+    ref2->increment_ref_count();
+    ASSERT_EQ(ref2->ref_count(), 1u);
+}
+
+TEST(InstrusivePtrTest, CallingIntrusiveFromThisOnUnmanagedObjectsThrows) {
+    SimpleRef2 ref2;
+    ASSERT_EQ(ref2.ref_count(), 0u);
+    ref2.throw_with_intrusive_from_this();
 }
 
 int main(int argc, char **argv) {

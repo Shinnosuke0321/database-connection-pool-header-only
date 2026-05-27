@@ -5,6 +5,7 @@
 #pragma once
 #include <atomic>
 #include <concepts>
+#include <memory>
 #include <print>
 
 namespace core {
@@ -24,15 +25,24 @@ namespace core {
     template<class derived>
     class ref_counted {
     public:
-        ref_counted() = default;
-        smart_ptr::intrusive_ptr<derived> intrusive_from_this() noexcept {
-            return smart_ptr::intrusive_ptr<derived>(static_cast<derived*>(this));
-        }
-        smart_ptr::intrusive_ptr<const derived> intrusive_from_this() const noexcept {
-            return smart_ptr::intrusive_ptr<const derived>(static_cast<const derived*>(this));
-        }
         uint32_t ref_count() const noexcept { return m_ref_count.load(std::memory_order_relaxed); }
     protected:
+        ref_counted() = default;
+
+        smart_ptr::intrusive_ptr<derived> intrusive_from_this() {
+            if (m_ref_count.load(std::memory_order_relaxed) == 0) {
+                throw std::runtime_error("derived class is not managed by the intrusive_ptr");
+            }
+            return smart_ptr::intrusive_ptr<derived>(static_cast<derived*>(this));
+        }
+
+        smart_ptr::intrusive_ptr<const derived> intrusive_from_this() const {
+            if (m_ref_count.load(std::memory_order_relaxed) == 0) {
+                throw std::runtime_error("derived class is not managed by the intrusive_ptr");
+            }
+            return smart_ptr::intrusive_ptr<const derived>(static_cast<const derived*>(this));
+        }
+
         virtual ~ref_counted() = default;
 
     private:
@@ -49,7 +59,6 @@ namespace core {
         template<class T>
         friend class smart_ptr::intrusive_ptr;
     private:
-
         mutable std::atomic_uint32_t m_ref_count = 0;
     };
 }
