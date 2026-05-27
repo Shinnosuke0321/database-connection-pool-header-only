@@ -249,8 +249,18 @@
       "output": {"outputOnFailure": true}
     },
     {
+      "name": "linux-clang-release",
+      "configurePreset": "linux-clang-release",
+      "output": {"outputOnFailure": true}
+    },
+    {
       "name": "macos-gcc-debug",
       "configurePreset": "macos-gcc-debug",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "macos-gcc-release",
+      "configurePreset": "macos-gcc-release",
       "output": {"outputOnFailure": true}
     },
     {
