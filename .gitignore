@@ -8,7 +8,10 @@ CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
 Makefile
-*.cmake
+
+!cmake/
+!cmake/toolchains/
+!cmake/toolchains/*.cmake
 
 # C++ compiled objects and libraries
 *.o
