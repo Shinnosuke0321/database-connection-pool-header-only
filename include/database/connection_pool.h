@@ -17,7 +17,7 @@
 namespace database {
     struct pool_config {
         std::size_t max_size = std::thread::hardware_concurrency();
-        std::size_t init_size = 10;
+        std::size_t init_size = 1;
         bool is_eager = false;
     };
 
@@ -29,10 +29,10 @@ namespace database {
             return smart_ptr::intrusive_ptr<connection_pool>(new connection_pool(std::move(factory), std::move(opt)));
         }
     public:
-        using SharedFactory = std::shared_ptr<ConnectionFactory>;
-        using AcquireResult = std::expected<connection_manager<T>, connection_error>;
+        using shared_factory = std::shared_ptr<ConnectionFactory>;
+        using acquire_result_t = std::expected<connection_manager<T>, connection_error>;
 
-        AcquireResult acquire(std::chrono::microseconds timeout = std::chrono::microseconds{10000}) noexcept {
+        acquire_result_t acquire(std::chrono::microseconds timeout = std::chrono::microseconds{10000}) noexcept {
             std::unique_lock lk(m_mutex);
             if (!m_connections.empty()) {
                 auto conn = std::move(m_connections.front());
@@ -89,7 +89,7 @@ namespace database {
             }
         }
     private:
-        explicit connection_pool(SharedFactory factory, const pool_config& opt = pool_config()) noexcept
+        explicit connection_pool(shared_factory factory, const pool_config& opt = pool_config()) noexcept
         : m_config(opt),
           m_factory(std::move(factory))
         {

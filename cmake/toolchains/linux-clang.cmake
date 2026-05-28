@@ -1,5 +1,5 @@
-set(CMAKE_C_COMPILER clang-19)
-set(CMAKE_CXX_COMPILER clang++-19)
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_CXX_COMPILER clang++)
 
 # Use libstdc++ on Linux
 set(CMAKE_CXX_FLAGS_INIT "-stdlib=libstdc++")
