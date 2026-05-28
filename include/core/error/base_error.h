@@ -105,5 +105,4 @@ namespace core::error {
 #define MAKE_UNEXPECTED_ERROR(category_class, type, message) \
     std::unexpected(category_class{type, #type, message})
 
-#define RETURN_UNEXPECTED_ERROR(category_class, type, message) \
-    return std::unexpected(category_class{type, #type, message})
+#define RETURN_UNEXPECTED_ERROR(category_class, type, message) return std::unexpected(category_class{type, #type, message})
