@@ -12,14 +12,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04
-            preset: linux-gcc-debug
-          - os: ubuntu-22.04
-            preset: linux-gcc-release
-          - os: ubuntu-22.04
-            preset: linux-clang-debug
-          - os: ubuntu-22.04
-            preset: linux-clang-release
           - os: ubuntu-24.04
             preset: linux-gcc-debug
           - os: ubuntu-24.04
