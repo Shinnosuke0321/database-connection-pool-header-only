@@ -15,7 +15,7 @@
 #include <core/memory/intrusive_ptr.h>
 
 namespace database {
-    struct pool_config {
+    struct pool_config_t {
         std::size_t max_size = std::thread::hardware_concurrency();
         std::size_t init_size = 1;
         bool is_eager = false;
@@ -25,7 +25,7 @@ namespace database {
     requires std::derived_from<T, IConnection>
     class connection_pool: public core::ref_counted<connection_pool<T>> {
     public:
-        static smart_ptr::intrusive_ptr<connection_pool> create(std::shared_ptr<ConnectionFactory> factory, const pool_config& opt = pool_config()) noexcept {
+        static smart_ptr::intrusive_ptr<connection_pool> create(std::shared_ptr<ConnectionFactory> factory, const pool_config_t& opt = pool_config_t()) noexcept {
             return smart_ptr::intrusive_ptr<connection_pool>(new connection_pool(std::move(factory), std::move(opt)));
         }
     public:
@@ -89,7 +89,7 @@ namespace database {
             }
         }
     private:
-        explicit connection_pool(shared_factory factory, const pool_config& opt = pool_config()) noexcept
+        explicit connection_pool(shared_factory factory, const pool_config_t& opt = pool_config_t()) noexcept
         : m_config(opt),
           m_factory(std::move(factory))
         {
@@ -157,11 +157,11 @@ namespace database {
     private:
         mutable std::mutex m_mutex;
         std::atomic_bool m_pool_ready = false;
-        pool_config m_config;
+        pool_config_t m_config;
         uint32_t m_conn_in_use = 0;
         std::queue<std::unique_ptr<T>> m_connections;
         std::condition_variable m_cv;
         std::shared_ptr<ConnectionFactory> m_factory;
         std::vector<std::jthread> m_threads;
     };
-} // namespace Core::Database
+}

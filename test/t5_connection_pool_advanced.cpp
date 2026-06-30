@@ -26,7 +26,7 @@ protected:
 
     void SetUp() override {
         factory = std::make_shared<database::ConnectionFactory>();
-        factory->register_factory<FakeConn>([this]() -> database::ConnectionResult {
+        factory->register_factory<FakeConn>([this]() -> database::connection_result_t {
             return std::unique_ptr<database::IConnection>(
                 new FakeConn{conn_id_counter.fetch_add(1)});
         });
@@ -34,7 +34,7 @@ protected:
 };
 
 TEST_F(PoolFeeder, LazyMode_PoolReadyImmediately) {
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = false;
     cfg.init_size = 2;
     cfg.max_size = 4;
@@ -46,7 +46,7 @@ TEST_F(PoolFeeder, LazyMode_PoolReadyImmediately) {
 }
 
 TEST_F(PoolFeeder, LazyMode_CanAcquireUpToMaxSize) {
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 6;
@@ -65,7 +65,7 @@ TEST_F(PoolFeeder, LazyMode_CanAcquireUpToMaxSize) {
 }
 
 TEST_F(PoolFeeder, Acquire_Timeout_WhenPoolExhausted) {
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 2;
@@ -86,7 +86,7 @@ TEST_F(PoolFeeder, Acquire_Timeout_WhenPoolExhausted) {
 }
 
 TEST_F(PoolFeeder, Acquire_ConnectionReturned_IsReused) {
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 1;
@@ -111,13 +111,13 @@ TEST_F(PoolFeeder, Acquire_ConnectionReturned_IsReused) {
 TEST_F(PoolFeeder, Acquire_FactoryFailure_ReturnsError) {
     // Override factory with one that always fails
     auto fail_factory = std::make_shared<database::ConnectionFactory>();
-    fail_factory->register_factory<FakeConn>([]() -> database::ConnectionResult {
+    fail_factory->register_factory<FakeConn>([]() -> database::connection_result_t {
         using namespace database;
         using conn_err_types::AuthFailed;
         RETURN_UNEXPECTED_ERROR(connection_error, AuthFailed, "injected failure");
     });
 
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 2;
@@ -131,7 +131,7 @@ TEST_F(PoolFeeder, Acquire_FactoryFailure_ReturnsError) {
 
 TEST_F(PoolFeeder, InvalidConfig_EagerWithInitGtMax_FallsToLazy) {
     // init_size > max_size with is_eager=true: condition fails, constructor falls to lazy path
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = true;
     cfg.init_size = 10;
     cfg.max_size = 5;
@@ -143,7 +143,7 @@ TEST_F(PoolFeeder, InvalidConfig_EagerWithInitGtMax_FallsToLazy) {
 }
 
 TEST_F(PoolFeeder, RefCountTracking_LazyMode) {
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = false;
     cfg.init_size = 1;
     cfg.max_size = 2;
@@ -161,7 +161,7 @@ TEST_F(PoolFeeder, RefCountTracking_LazyMode) {
 }
 
 TEST_F(PoolFeeder, PoolOutlivedByManager_NoUseAfterFree) {
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 1;
@@ -183,7 +183,7 @@ TEST_F(PoolFeeder, PoolOutlivedByManager_NoUseAfterFree) {
 }
 
 TEST_F(PoolFeeder, ConcurrentAcquireRelease_NoRefLeak) {
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 8;
@@ -213,7 +213,7 @@ TEST_F(PoolFeeder, ConcurrentAcquireRelease_NoRefLeak) {
 }
 
 TEST_F(PoolFeeder, HighContention_AllAcquiresSucceedOrTimeout) {
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 4;

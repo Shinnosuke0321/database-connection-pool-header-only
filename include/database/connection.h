@@ -11,5 +11,5 @@ namespace database {
         virtual ~IConnection() = default;
     };
 
-    using ConnectionResult = std::expected<std::unique_ptr<IConnection>, connection_error>;
+    using connection_result_t = std::expected<std::unique_ptr<IConnection>, connection_error>;
 }

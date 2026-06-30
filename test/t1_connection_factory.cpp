@@ -21,7 +21,7 @@ protected:
 };
 
 TEST_F(ConnectionFactoryTest, CreateAfterRegistration_Succeeds) {
-    factory.register_factory<ConnA>([]() -> ConnectionResult {
+    factory.register_factory<ConnA>([]() -> connection_result_t {
         return std::unique_ptr<IConnection>(new ConnA{});
     });
 
@@ -32,7 +32,7 @@ TEST_F(ConnectionFactoryTest, CreateAfterRegistration_Succeeds) {
 }
 
 TEST_F(ConnectionFactoryTest, FactoryReturningError_Propagates) {
-    factory.register_factory<ConnA>([]() -> ConnectionResult {
+    factory.register_factory<ConnA>([]() -> connection_result_t {
         RETURN_UNEXPECTED_ERROR(database::connection_error, database::conn_err_types::AuthFailed, "bad creds");
     });
 
@@ -42,10 +42,10 @@ TEST_F(ConnectionFactoryTest, FactoryReturningError_Propagates) {
 }
 
 TEST_F(ConnectionFactoryTest, TwoDistinctTypes_BothWork) {
-    factory.register_factory<ConnA>([]() -> ConnectionResult {
+    factory.register_factory<ConnA>([]() -> connection_result_t {
         return std::unique_ptr<IConnection>(new ConnA{});
     });
-    factory.register_factory<ConnB>([]() -> ConnectionResult {
+    factory.register_factory<ConnB>([]() -> connection_result_t {
         return std::unique_ptr<IConnection>(new ConnB{});
     });
 
@@ -58,12 +58,12 @@ TEST_F(ConnectionFactoryTest, TwoDistinctTypes_BothWork) {
 }
 
 TEST_F(ConnectionFactoryTest, ReRegistration_OverwritesPrevious) {
-    factory.register_factory<ConnA>([]() -> ConnectionResult {
+    factory.register_factory<ConnA>([]() -> connection_result_t {
         auto c = std::make_unique<ConnA>();
         c->tag = 1;
         return std::unique_ptr<IConnection>(std::move(c));
     });
-    factory.register_factory<ConnA>([]() -> ConnectionResult {
+    factory.register_factory<ConnA>([]() -> connection_result_t {
         auto c = std::make_unique<ConnA>();
         c->tag = 99;
         return std::unique_ptr<IConnection>(std::move(c));
@@ -76,7 +76,7 @@ TEST_F(ConnectionFactoryTest, ReRegistration_OverwritesPrevious) {
 
 TEST_F(ConnectionFactoryTest, FactoryCalledEachTime_NotCached) {
     std::atomic call_count{0};
-    factory.register_factory<ConnA>([&call_count]() -> ConnectionResult {
+    factory.register_factory<ConnA>([&call_count]() -> connection_result_t {
         ++call_count;
         return std::unique_ptr<IConnection>(new ConnA{});
     });
@@ -90,7 +90,7 @@ TEST_F(ConnectionFactoryTest, FactoryCalledEachTime_NotCached) {
 // create_connection now copies the factory function while holding the shared lock,
 // so concurrent writers replacing the entry cannot cause a dangling-reference crash.
 TEST_F(ConnectionFactoryTest, ConcurrentReaderWriter_NoDataRace) {
-    factory.register_factory<ConnA>([]() -> ConnectionResult {
+    factory.register_factory<ConnA>([]() -> connection_result_t {
         return std::unique_ptr<IConnection>(new ConnA{});
     });
 
@@ -102,7 +102,7 @@ TEST_F(ConnectionFactoryTest, ConcurrentReaderWriter_NoDataRace) {
     for (int i = 0; i < 4; ++i) {
         threads.emplace_back([this, &running]() {
             while (running.load(std::memory_order_relaxed)) {
-                factory.register_factory<ConnA>([]() -> ConnectionResult {
+                factory.register_factory<ConnA>([]() -> connection_result_t {
                     return std::unique_ptr<IConnection>(new ConnA{});
                 });
             }

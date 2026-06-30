@@ -21,11 +21,11 @@ namespace {
 TEST(ConnectionPoolTest, PoolTest) {
     auto factory = std::make_shared<database::ConnectionFactory>();
 
-    factory->register_factory<FakeConn>([]() -> database::ConnectionResult {
+    factory->register_factory<FakeConn>([]() -> database::connection_result_t {
         return std::unique_ptr<database::IConnection>(new FakeConn{});
     });
 
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = true;
 
     auto pool = database::connection_pool<FakeConn>::create(factory, cfg);
@@ -51,11 +51,11 @@ TEST(ConnectionPoolTest, PoolTest) {
 }
 TEST(ConnectionPoolTest, LazyPool_BasicAcquire) {
     auto factory = std::make_shared<database::ConnectionFactory>();
-    factory->register_factory<FakeConn>([]() -> database::ConnectionResult {
+    factory->register_factory<FakeConn>([]() -> database::connection_result_t {
         return std::unique_ptr<database::IConnection>(new FakeConn{});
     });
 
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = false;
     cfg.init_size = 2;
     cfg.max_size = 4;
@@ -74,11 +74,11 @@ TEST(ConnectionPoolTest, LazyPool_BasicAcquire) {
 
 TEST(ConnectionPoolTest, MultipleAcquires_UpToMaxSize) {
     auto factory = std::make_shared<database::ConnectionFactory>();
-    factory->register_factory<FakeConn>([]() -> database::ConnectionResult {
+    factory->register_factory<FakeConn>([]() -> database::connection_result_t {
         return std::unique_ptr<database::IConnection>(new FakeConn{});
     });
 
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 3;
@@ -102,11 +102,11 @@ TEST(ConnectionPoolTest, MultipleAcquires_UpToMaxSize) {
 
 TEST(ConnectionPoolTest, TimeoutOnExhaustedPool) {
     auto factory = std::make_shared<database::ConnectionFactory>();
-    factory->register_factory<FakeConn>([]() -> database::ConnectionResult {
+    factory->register_factory<FakeConn>([]() -> database::connection_result_t {
         return std::unique_ptr<database::IConnection>(new FakeConn{});
     });
 
-    database::pool_config cfg;
+    database::pool_config_t cfg;
     cfg.is_eager = false;
     cfg.init_size = 0;
     cfg.max_size = 1;
